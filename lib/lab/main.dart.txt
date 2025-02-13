@@ -1,0 +1,61 @@
+import 'dart:io';
+import 'CRUD/CRUD.dart';
+void main() {
+  User user = new User();
+
+
+int n;
+  do {
+    stdout.write('\n1.insert user'
+        '\n2.delete user'
+        '\n3.update user'
+        '\n4.get user'
+    );
+     n = int.parse(stdin.readLineSync()!);
+
+    switch (n) {
+      case 1:
+        stdout.write("enter name: ");
+        String name = stdin.readLineSync()!;
+        stdout.write("enter email: ");
+        String email = stdin.readLineSync()!;
+        stdout.write("enter rollno: ");
+        String rollno = stdin.readLineSync()!;
+        user.adduser(name: name, email: email, rollno: rollno);
+        break;
+
+      case 2:
+        print("enter id");
+        int id = int.parse(stdin.readLineSync()!);
+        user.deleteuser(id);
+        break;
+
+      case 3:
+        print("enter id");
+
+        int id = int.parse(stdin.readLineSync()!);
+        stdout.write("enter name: ");
+        String name = stdin.readLineSync()!;
+        stdout.write("enter email: ");
+        String email = stdin.readLineSync()!;
+        stdout.write("enter rollno: ");
+        String rollno = stdin.readLineSync()!;
+        user.updateUser(name: name, email: email, rollno: rollno, id: id);
+        break;
+
+      case 4:
+       print(user.getalluser());
+        break;
+      case 5:
+        print("thanks for visiting");
+        break;
+      default:
+        print("invalid choice");
+    }
+  }while(n!=6);
+  }
+
+
+
+
+  

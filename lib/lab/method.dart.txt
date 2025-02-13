@@ -1,0 +1,28 @@
+import 'dart:io';
+class User{
+  List<Map<String,dynamic>> userlist=[];
+    void adduser({required name, required email, required rollno}){
+    Map<String,dynamic> map={};
+    map [name]=name;
+    map [email]=email;
+    map [rollno]=rollno;
+    userlist.add(map);
+  }
+
+  List<Map<String,dynamic>> getalluser(){
+
+    return userlist;
+  }
+
+  void updateUser({required name,required email,required rollno,required id}){
+    Map<String,dynamic> map={};
+    map [name]=name;
+    map [email]=email;
+    map [rollno]=rollno;
+    userlist[id]=map;
+  }
+
+  void deleteuser(id){
+      userlist.removeAt(id);
+  }
+}
