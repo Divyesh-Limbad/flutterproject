@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'database/database_helper.dart';
 
 class UpdateUser extends StatefulWidget {
   final Map<String, dynamic> user;
@@ -13,6 +14,8 @@ class UpdateUser extends StatefulWidget {
 }
 
 class _UpdateUserState extends State<UpdateUser> {
+  final DatabaseHelper dbHelper = DatabaseHelper();
+
   late TextEditingController fullNameController;
   late TextEditingController emailController;
   late TextEditingController mobileController;
@@ -39,17 +42,25 @@ class _UpdateUserState extends State<UpdateUser> {
     selectedCity = widget.user['city'];
     selectedGender = widget.user['gender'];
 
-    // Handle hobbies whether it's a List<String> or Map<String, dynamic>
-    var hobbiesData = widget.user['hobbies'];
-    if (hobbiesData is List<String>) {
-      isCricket = hobbiesData.contains("Cricket");
-      isReading = hobbiesData.contains("Reading");
-      isDancing = hobbiesData.contains("Dancing");
-    } else if (hobbiesData is Map<String, dynamic>) {
-      isCricket = hobbiesData['Cricket'] ?? false;
-      isReading = hobbiesData['Reading'] ?? false;
-      isDancing = hobbiesData['Dancing'] ?? false;
+    // Initialize hobbies based on user data
+    List<dynamic> hobbiesList = [];
+
+    // Include the provided code snippet here
+    if (widget.user['hobbies'] is String) {
+      hobbiesList = widget.user['hobbies']
+          .split(',')
+          .map((hobby) => hobby.trim())
+          .toList();
+    } else if (widget.user['hobbies'] is List) {
+      hobbiesList = (widget.user['hobbies'] as List<dynamic>)
+          .map((hobby) => hobby.toString().trim())
+          .toList();
     }
+
+    // Set the state of hobbies based on existing data
+    isCricket = hobbiesList.contains("Cricket");
+    isReading = hobbiesList.contains("Reading");
+    isDancing = hobbiesList.contains("Dancing");
   }
 
   @override
@@ -73,6 +84,26 @@ class _UpdateUserState extends State<UpdateUser> {
         dobController.text = DateFormat('dd/MM/yyyy').format(picked);
       });
     }
+  }
+
+  void resetForm() {
+    fullNameController.clear();
+    emailController.clear();
+    mobileController.clear();
+    dobController.clear();
+
+    selectedCity = null;
+    selectedGender = null;
+
+    isCricket = false;
+    isReading = false;
+    isDancing = false;
+
+    setState(() {});
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Form reset successfully')),
+    );
   }
 
   @override
@@ -136,22 +167,27 @@ class _UpdateUserState extends State<UpdateUser> {
                 buildDatePickerField(),
                 buildHobbiesSection(),
                 const SizedBox(height: 20),
+                buildResetButton(),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       Map<String, dynamic> updatedUser = {
+                        'id': widget.user['id'], // Include the user ID
                         'fullName': fullNameController.text,
                         'email': emailController.text,
                         'mobile': mobileController.text,
                         'city': selectedCity,
                         'gender': selectedGender,
                         'dob': dobController.text,
-                        'hobbies': {
-                          'Cricket': isCricket,
-                          'Reading': isReading,
-                          'Dancing': isDancing,
-                        },
+                        'hobbies': [
+                          if (isCricket) "Cricket",
+                          if (isReading) "Reading",
+                          if (isDancing) "Dancing",
+                        ].join(', '), // Convert list to string
                       };
+                      dbHelper
+                          .updateUser(updatedUser); // Update user in database
                       widget.onUpdate(updatedUser);
                       Navigator.pop(context);
                     }
@@ -169,6 +205,21 @@ class _UpdateUserState extends State<UpdateUser> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget buildResetButton() {
+    return ElevatedButton(
+      onPressed: resetForm,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.grey,
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+      child: const Text(
+        'Reset',
+        style: TextStyle(fontSize: 18, color: Colors.white),
       ),
     );
   }

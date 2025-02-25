@@ -59,17 +59,7 @@ class UserDetail extends StatelessWidget {
                   _buildInfoRow(Icons.cake, "DOB", user['dob']),
                   _buildInfoRow(Icons.accessibility_new, "Age",
                       "${_calculateAge(user['dob'])} years"),
-                  _buildInfoRow(
-                    Icons.favorite,
-                    "Hobbies",
-                    user['hobbies'] != null
-                        ? user['hobbies']
-                            .entries
-                            .where((entry) => entry.value == true)
-                            .map((entry) => entry.key)
-                            .join(", ")
-                        : "None",
-                  ),
+                  _buildInfoRow(Icons.favorite, "Hobbies", user['hobbies']),
 
                   SizedBox(height: 20),
 

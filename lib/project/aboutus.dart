@@ -16,13 +16,14 @@ class _AboutusState extends State<AboutUs> {
           'About Us',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Color(0xFF512DA8), // Deep Purple Shade
+        backgroundColor: Colors.pinkAccent, // Match the homepage color
         elevation: 0,
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF512DA8), Color(0xFF311B92)],
+            colors: [Colors.pinkAccent.shade200, Colors.white],
+            // Match the homepage gradient
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -33,11 +34,12 @@ class _AboutusState extends State<AboutUs> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                'Typing Tutor',
+                'Divyesh Limbad',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color:
+                      Colors.black, // Change text color for better visibility
                 ),
               ),
               SizedBox(height: 20),
@@ -193,13 +195,13 @@ class _AboutusState extends State<AboutUs> {
         Text(
           '© 2025 Darshan University',
           style: TextStyle(
-              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
         ),
         Text(
           'All Rights Reserved - Privacy Policy',
           style: TextStyle(
             fontSize: 16,
-            color: Colors.white,
+            color: Colors.black,
             decoration: TextDecoration.underline,
           ),
         ),
@@ -209,14 +211,14 @@ class _AboutusState extends State<AboutUs> {
           children: [
             Text(
               'Made with',
-              style: TextStyle(fontSize: 18, color: Colors.white),
+              style: TextStyle(fontSize: 18, color: Colors.black),
             ),
             SizedBox(width: 4),
             Icon(Icons.favorite, color: Colors.red, size: 20),
             SizedBox(width: 4),
             Text(
               'in India',
-              style: TextStyle(fontSize: 18, color: Colors.white),
+              style: TextStyle(fontSize: 18, color: Colors.black),
             ),
           ],
         ),

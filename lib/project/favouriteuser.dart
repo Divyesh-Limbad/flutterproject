@@ -23,10 +23,11 @@ class _FavouriteState extends State<Favourite> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Favorite Users'),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.pink, // Change to match UserList
         centerTitle: true,
         elevation: 5,
       ),
+      backgroundColor: Colors.pink[50], // Light pink background color
       body: Column(
         children: [
           Padding(
@@ -34,7 +35,8 @@ class _FavouriteState extends State<Favourite> {
             child: TextField(
               decoration: InputDecoration(
                 labelText: 'Search Users',
-                prefixIcon: const Icon(Icons.search, color: Colors.blueAccent),
+                prefixIcon: const Icon(Icons.search, color: Colors.pink),
+                // Match search icon color
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -65,99 +67,112 @@ class _FavouriteState extends State<Favourite> {
                             horizontal: 12, vertical: 6),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
-                        elevation: 3,
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 30,
-                                    backgroundColor: Colors.blueAccent,
-                                    child: Text(
-                                      user['fullName'][0].toUpperCase(),
-                                      style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold),
+                        elevation: 0,
+                        // Remove elevation for a flat look
+                        color: Colors.transparent,
+                        // Set card color to be transparent
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.pink[50],
+                            // Light pink background for the card
+                            border: Border.all(color: Colors.pink, width: 2),
+                            // Pink border
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 30,
+                                      backgroundColor: Colors.blueAccent,
+                                      child: Text(
+                                        user['fullName'][0].toUpperCase(),
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold),
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Text(
-                                      user['fullName'],
-                                      style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        user['fullName'],
+                                        style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              _buildInfoRow(Icons.email, user['email']),
-                              _buildInfoRow(Icons.phone, user['mobile']),
-                              _buildInfoRow(Icons.location_city, user['city']),
-                              const SizedBox(height: 10),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.favorite,
-                                        color: Colors.red),
-                                    onPressed: () {
-                                      setState(() {
-                                        widget.favoriteUsers.remove(user);
-                                      });
-                                    },
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.edit,
-                                        color: Colors.blue),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => UpdateUser(
-                                            user: user,
-                                            onUpdate: (updatedUser) {
-                                              setState(() {
-                                                widget.favoriteUsers[index] =
-                                                    updatedUser;
-                                              });
-                                            },
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                _buildInfoRow(Icons.email, user['email']),
+                                _buildInfoRow(Icons.phone, user['mobile']),
+                                _buildInfoRow(
+                                    Icons.location_city, user['city']),
+                                const SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.favorite,
+                                          color: Colors.red),
+                                      onPressed: () {
+                                        setState(() {
+                                          widget.favoriteUsers.remove(user);
+                                        });
+                                      },
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.edit,
+                                          color: Colors.blue),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => UpdateUser(
+                                              user: user,
+                                              onUpdate: (updatedUser) {
+                                                setState(() {
+                                                  widget.favoriteUsers[index] =
+                                                      updatedUser;
+                                                });
+                                              },
+                                            ),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete,
-                                        color: Colors.red),
-                                    onPressed: () {
-                                      _showDeleteConfirmationDialog(
-                                          context, user, index);
-                                    },
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.info,
-                                        color: Colors.green),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                UserDetail(user: user)),
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ],
+                                        );
+                                      },
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete,
+                                          color: Colors.red),
+                                      onPressed: () {
+                                        _showDeleteConfirmationDialog(
+                                            context, user, index);
+                                      },
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.info,
+                                          color: Colors.green),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  UserDetail(user: user)),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       );

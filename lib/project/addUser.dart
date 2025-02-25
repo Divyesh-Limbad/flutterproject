@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Import this for TextInputFormatter
+import 'database/database_helper.dart';
 
 class AddUser extends StatefulWidget {
   const AddUser({super.key});
@@ -9,6 +10,8 @@ class AddUser extends StatefulWidget {
 }
 
 class _AddUserState extends State<AddUser> {
+  final DatabaseHelper dbHelper = DatabaseHelper();
+
   var fullNameController = TextEditingController();
   var emailController = TextEditingController();
   var mobileController = TextEditingController();
@@ -18,6 +21,8 @@ class _AddUserState extends State<AddUser> {
 
   final _formKey = GlobalKey<FormState>();
   String? _password;
+  bool _passwordVisible = false;
+  bool _confirmPasswordVisible = false;
 
   List<String> cities = ['Ahmedabad', 'Surat', 'Rajkot', 'Vadodara'];
   String? selectedCity;
@@ -59,7 +64,7 @@ class _AddUserState extends State<AddUser> {
       appBar: AppBar(
         title:
             Text('Add a User', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.pinkAccent,
         centerTitle: true,
       ),
       body: Container(
@@ -74,11 +79,14 @@ class _AddUserState extends State<AddUser> {
                   controller: fullNameController,
                   label: 'Full Name',
                   icon: Icons.person,
+                  textCapitalization: TextCapitalization.words,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r"[a-zA-Z\s']")),
+                  ],
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Enter a valid name';
                     }
-                    // Regex to allow only letters, spaces, and apostrophes
                     if (!RegExp(r"^[a-zA-Z\s']+$").hasMatch(value)) {
                       return 'Only letters, spaces, and apostrophes allowed';
                     }
@@ -145,11 +153,17 @@ class _AddUserState extends State<AddUser> {
                 ),
                 buildDatePickerField(context),
                 buildHobbiesSection(),
-                buildTextField(
+                // Password Field with Toggle
+                buildPasswordField(
                   controller: passwordController,
                   label: 'Password',
                   icon: Icons.lock,
-                  obscureText: true,
+                  isPasswordVisible: _passwordVisible,
+                  onVisibilityToggle: () {
+                    setState(() {
+                      _passwordVisible = !_passwordVisible;
+                    });
+                  },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Enter a password';
@@ -166,11 +180,17 @@ class _AddUserState extends State<AddUser> {
                     return null;
                   },
                 ),
-                buildTextField(
+                // Confirm Password Field with Toggle
+                buildPasswordField(
                   controller: confirmPasswordController,
                   label: 'Confirm Password',
                   icon: Icons.lock,
-                  obscureText: true,
+                  isPasswordVisible: _confirmPasswordVisible,
+                  onVisibilityToggle: () {
+                    setState(() {
+                      _confirmPasswordVisible = !_confirmPasswordVisible;
+                    });
+                  },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Confirm your password';
@@ -181,6 +201,7 @@ class _AddUserState extends State<AddUser> {
                     return null;
                   },
                 ),
+
                 const SizedBox(height: 20),
                 buildResetButton(),
                 const SizedBox(height: 10),
@@ -189,6 +210,68 @@ class _AddUserState extends State<AddUser> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget buildPasswordField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    required bool isPasswordVisible,
+    required Function() onVisibilityToggle,
+    String? Function(String?)? validator,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: TextFormField(
+        controller: controller,
+        obscureText: !isPasswordVisible,
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: Icon(icon, color: Colors.blueAccent),
+          suffixIcon: IconButton(
+            icon: Icon(
+              isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+              color: Colors.blueAccent,
+            ),
+            onPressed: onVisibilityToggle,
+          ),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          filled: true,
+          fillColor: Colors.white,
+        ),
+        validator: validator,
+      ),
+    );
+  }
+
+  Widget buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    TextInputType keyboardType = TextInputType.text,
+    bool obscureText = false,
+    String? Function(String?)? validator,
+    TextCapitalization textCapitalization = TextCapitalization.none,
+    List<TextInputFormatter>? inputFormatters,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        obscureText: obscureText,
+        textCapitalization: textCapitalization,
+        inputFormatters: inputFormatters,
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: Icon(icon, color: Colors.blueAccent),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          filled: true,
+          fillColor: Colors.white,
+        ),
+        validator: validator,
       ),
     );
   }
@@ -210,64 +293,37 @@ class _AddUserState extends State<AddUser> {
 
   Widget buildSubmitButton() {
     return ElevatedButton(
-      onPressed: () {
+      onPressed: () async {
         if (_formKey.currentState!.validate()) {
           List<String> selectedHobbies = [];
           if (isCricket) selectedHobbies.add('Cricket');
           if (isReading) selectedHobbies.add('Reading');
           if (isDancing) selectedHobbies.add('Dancing');
 
-          users.add({
+          Map<String, dynamic> user = {
             'fullName': fullNameController.text,
             'email': emailController.text,
             'mobile': mobileController.text,
             'city': selectedCity,
             'gender': selectedGender,
             'dob': dobController.text,
-            'hobbies': selectedHobbies,
-          });
+            'hobbies': selectedHobbies.join(', '),
+          };
 
-          resetForm();
-          Navigator.pop(context, users);
+          await dbHelper.insertUser(user); // Insert user into database
+
+          resetForm(); // Clear the form fields
+          Navigator.pop(context, user); // Return the new user data
         }
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.pinkAccent,
         padding: const EdgeInsets.symmetric(vertical: 14),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
       child: const Text(
         'Submit',
         style: TextStyle(fontSize: 18, color: Colors.white),
-      ),
-    );
-  }
-
-  Widget buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    TextInputType keyboardType = TextInputType.text,
-    bool obscureText = false,
-    String? Function(String?)? validator,
-    List<TextInputFormatter>? inputFormatters, // Add this parameter
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: keyboardType,
-        obscureText: obscureText,
-        inputFormatters: inputFormatters,
-        // Use the inputFormatters
-        decoration: InputDecoration(
-          labelText: label,
-          prefixIcon: Icon(icon, color: Colors.blueAccent),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          filled: true,
-          fillColor: Colors.white,
-        ),
-        validator: validator,
       ),
     );
   }
