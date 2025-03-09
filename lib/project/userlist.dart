@@ -187,6 +187,7 @@ class _UserListState extends State<UserList> {
                                   style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 20,
+
                                       fontWeight: FontWeight.bold),
                                 ),
                               ),
